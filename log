@@ -1,0 +1,15 @@
+import arcpy
+import datetime
+arcpy.env.overwriteOutput = True
+now = datetime.date.today()
+log = open("C:\GISData\Scripts_logs\WaterErrors_%s" %now.strftime("%Y-%m-%d") + ".txt", "w")
+log.write("Water Errors Query")
+log.write("\n----------------------------------------")
+start = datetime.datetime.now()
+log.write("\n\nStarted at %s" % start)
+CurrentYear = now.strftime("%Y")
+arcpy.AddMessage("Water errors script done!")
+log.write("\ndone")
+end = datetime.datetime.now()
+log.write("\n\nFinished at %s\nScript took %s to complete" % (str(end), str(end - start)))
+log.close()
