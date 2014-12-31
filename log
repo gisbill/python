@@ -13,3 +13,14 @@ log.write("\ndone")
 end = datetime.datetime.now()
 log.write("\n\nFinished at %s\nScript took %s to complete" % (str(end), str(end - start)))
 log.close()
+
+or
+
+import datetime
+import time
+now = time.strftime("%b %d %Y %H %M")
+start = datetime.datetime.now()
+log.write("\n\nStarted at %s" % start)
+end = datetime.datetime.now()
+log.write("\n\nFinished at %s\nScript took %s to complete" % (str(end), str(end - start)))
+log.close()
