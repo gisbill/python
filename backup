@@ -1,0 +1,154 @@
+# ----------------------------------------------------------------------------------------------
+# sde1 Backup
+# This script keeps an archive of critical features, running as needed, ideally just before the python update scripts.
+# Every feature which is updated with the python update tools should be in this script.
+# Other important but rarely updated features should be kept in Secondary.gdb.
+# ----------------------------------------------------------------------------------------------
+
+# Import system modules
+import arcpy, sys, traceback, datetime
+from arcpy import env
+#from datetime import date
+now = datetime.date.today()
+
+print 'starting script'
+
+#log = open("E:\GISMAPFILES\Utilities\Editing\PythonUpdate\logs\sde1_backupdate_%s" %now.strftime("%Y-%m-%d") + ".txt", "w")
+log = open("E:\GISMAPFILES\Utilities\Editing\PythonUpdate\logs\sde1_backupdate.txt", "a")
+log.write("----------------------------------------")
+log.write("\nBackup sde1")
+
+# Write start date and time to log file
+start = datetime.datetime.now()
+log.write("\n\nStarted at %s" % start)
+
+
+#-variables:---------------------------------------------------------------------------------------
+
+# Local variables...
+#CONNECTION="Database Connections\\sdelayers@SDE-101.sde\\"
+Backup_db = "E:\GISMAPFILES\Utilities\Editing\PythonUpdate\Backup_Data\SDE1_Backup.gdb"
+
+ssMain = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_SanitarySewer\UTIL.ssMain"
+ssManhole = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_SanitarySewer\UTIL.ssManhole"
+ssService = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_SanitarySewer\UTIL.ssService"
+sdMain = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_StormDrainage\UTIL.sdMain"
+sdManhole = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_StormDrainage\UTIL.sdMain"
+sdCulvertPoly = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_StormDrainage\UTIL.sdManhole"
+wdFireHyd = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdFireHyd"
+wdLateral = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdLateral"
+wdMain = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdMain"
+wdMeterPit = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdMeterPit"
+wdNode = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdNode"
+wdValve = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_WaterDistribution\UTIL.wdValve"
+Easements = "Database Connections\SDE1_GIS_view.sde\BASEMAP.Easements"
+Water_Main_Breaks = "Database Connections\SDE1_UtilUser.sde\UTIL.Water_Main_Breaks"
+UMMS_MAINBREAK = "Database Connections\SDE1_UtilUser.sde\UTIL.UMMS_MAINBREAK"
+
+## Transportation Features ##
+
+
+TableDict = {
+             ssMain,
+             ssManhole, 
+             ssService,
+             sdMain, 
+             sdManhole, 
+             sdCulvertPoly, 
+             wdFireHyd, 
+             wdLateral, 
+             wdMain,
+             wdMeterPit,
+             wdNode,
+             wdValve,
+             Easements,
+             Water_Main_Breaks,
+             UMMS_MAINBREAK
+            }
+
+#Check that SDE1 data exists before continuing
+for featureName in TableDict:
+    if not arcpy.Exists(featureName):
+        print (featureName + ' does not exist... exiting now')
+        log.write(featureName + " does not exist... exiting now")
+        sys.exit()
+    else:
+        print (featureName + ' does exist')
+
+print 'features exist in sde. continuing...'
+log.write("\n\nfeatures exist in sde. continuing...")
+
+arcpy.env.overwriteOutput = True
+
+#-geoprocessing:----------------------------------------------------------------------------------------------------------------
+
+# Process: Create File GDB
+arcpy.CreateFileGDB_management("E:\GISMAPFILES\Utilities\Editing\PythonUpdate\Backup_Data", "SDE1_Backup_%s" %now.strftime("%Y-%m-%d") + ".gdb", "CURRENT")
+#"E:\GISMAPFILES\Utilities\Editing\PythonUpdate\logs\sde1_backupdate_%s" %now.strftime("%Y-%m-%d") + ".txt", "w"
+print 'created GDB'
+sys.exit()
+
+# Process: Feature Class to Geodatabase (multiple) (1)...
+#arcpy.FeatureClassToGeodatabase_conversion(SewerDevices; SewerLines; WaterDevices; WaterLines, Backup_db)
+arcpy.FeatureClassToGeodatabase_conversion(ssMain, Backup_db)
+print 'exported sewer mains'
+
+# Process: Feature Class to Geodatabase (multiple) (2)...
+arcpy.FeatureClassToGeodatabase_conversion(ssManhole, Backup_db)
+print 'exported sewer manholes'
+
+# Process: Feature Class to Geodatabase (multiple) (3)...
+arcpy.FeatureClassToGeodatabase_conversion(ssService, Backup_db)
+print 'exported sewer services'
+
+# Process: Feature Class to Geodatabase (multiple) (4)...
+arcpy.FeatureClassToGeodatabase_conversion(sdMain, Backup_db)
+print 'exported storm mains'
+
+# Process: Feature Class to Geodatabase (multiple) (5)...
+arcpy.FeatureClassToGeodatabase_conversion(sdManhole, Backup_db)
+print 'exported storm manholes'
+
+# Process: Feature Class to Geodatabase (multiple) (6)...
+arcpy.FeatureClassToGeodatabase_conversion(sdCulvertPoly, Backup_db)
+print 'exported storm culverts'
+
+# Process: Feature Class to Geodatabase (multiple) (7)...
+arcpy.FeatureClassToGeodatabase_conversion(wdFireHyd, Backup_db)
+print 'exported hydrants'
+
+# Process: Feature Class to Geodatabase (multiple) (8)...
+arcpy.FeatureClassToGeodatabase_conversion(wdLateral, Backup_db)
+print 'exported storm laterals'
+
+# Process: Feature Class to Geodatabase (multiple) (9)...
+arcpy.FeatureClassToGeodatabase_conversion(wdMain, Backup_db)
+print 'exported water mains'
+
+# Process: Feature Class to Geodatabase (multiple) (10)...
+arcpy.FeatureClassToGeodatabase_conversion(wdMeterPit, Backup_db)
+print 'exported meter pits'
+
+# Process: Feature Class to Geodatabase (multiple) (11)...
+arcpy.FeatureClassToGeodatabase_conversion(wdNode, Backup_db)
+print 'exported water nodes'
+
+# Process: Feature Class to Geodatabase (multiple) (12)...
+arcpy.FeatureClassToGeodatabase_conversion(wdValve, Backup_db)
+print 'exported water valves'
+
+# Process: Feature Class to Geodatabase (multiple) (13)...
+arcpy.FeatureClassToGeodatabase_conversion(Easements, Backup_db)
+print 'exported easements'
+
+log.write("\nimported new features")
+
+
+print 'done'
+log.write("\ndone")
+
+# write the end date and time, and how long it took to run the script
+end = datetime.datetime.now()
+log.write("\n\nFinished at %s\nScript took %s to complete" % (str(end), str(end - start)) + "\n\n")
+# close log file
+log.close()
